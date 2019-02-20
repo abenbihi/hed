@@ -19,7 +19,7 @@ DATA_ROOT_DIR = '/home/gpu_user/assia/ws/datasets/kitti'
 SEQ_L = ['%02d'%d for d in range(11)]
 IMG_SUBDIR = 'image_2'
 RES_DIR = './res'
-
+NEW_W, NEW_H = 1242,375
 
 # Make sure that caffe is on the python path:
 caffe_root = '../../'  # this file is expected to be in {caffe_root}/examples/hed/
@@ -80,16 +80,16 @@ for seq in SEQ_L:
     fuse_dir = os.path.join(out_dir, 'fuse')
     if not os.path.exists(fuse_dir):
         os.makedirs(fuse_dir)
-    scale_dir = {}
-    for i in range(1,6):
-        scale_dir[i] = os.path.join(out_dir, 'scale_%d'%i)
-        if not os.path.exists(scale_dir[i]):
-            os.makedirs(scale_dir[i])
+    #scale_dir = {}
+    #for i in range(1,6):
+    #    scale_dir[i] = os.path.join(out_dir, 'scale_%d'%i)
+    #    if not os.path.exists(scale_dir[i]):
+    #        os.makedirs(scale_dir[i])
 
     # let's go
     img_dir = os.path.join(DATA_ROOT_DIR, seq, IMG_SUBDIR)
     for img_root_fn in sorted(os.listdir(img_dir)):
-        fuse_fn = os.path.join(fuse_dir, img_root_fn.split(".")[0] +'.txt')
+        fuse_fn = os.path.join(fuse_dir, img_root_fn)
         if os.path.exists(fuse_fn):
             continue
         duration = time.time() - global_start_time
@@ -97,9 +97,12 @@ for seq in SEQ_L:
 
 
         img_fn = os.path.join(img_dir, img_root_fn)
-        im = Image.open(img_fn)
-        in_ = np.array(im, dtype=np.float32)
-        in_ = in_[:,:,::-1]
+        #im = Image.open(img_fn)
+        #in_ = np.array(im, dtype=np.float32)
+        #in_ = in_[:,:,::-1]
+        in_ = cv2.imread(img_fn)
+        in_ = cv2.resize(in_, (NEW_W, NEW_H), interpolation=cv2.INTER_AREA)
+        in_ = in_.astype(np.float32)
         in_ -= np.array((104.00698793,116.66876762,122.67891434))
     
 
@@ -127,12 +130,12 @@ for seq in SEQ_L:
         cv2.imwrite(fuse_fn, fuse)
 
         # save multi scale edge prob
-        scale_lst = [out1, out2, out3, out4, out5]
-        for i, out in enumerate(scale_lst):
-            #out_fn = os.path.join(scale_dir[i+1], img_root_fn.split(".")[0] +'.txt')
-            #np.savetxt(out_fn, (255*out).astype(np.uint8))
-            out_fn = os.path.join(scale_dir[i+1], img_root_fn)
-            cv2.imwrite(out_fn, (255*out).astype(np.uint8))
+        #scale_lst = [out1, out2, out3, out4, out5]
+        #for i, out in enumerate(scale_lst):
+        #    #out_fn = os.path.join(scale_dir[i+1], img_root_fn.split(".")[0] +'.txt')
+        #    #np.savetxt(out_fn, (255*out).astype(np.uint8))
+        #    out_fn = os.path.join(scale_dir[i+1], img_root_fn)
+        #    cv2.imwrite(out_fn, (255*out).astype(np.uint8))
         
         #fuse = (1-fuse)
         #print(fuse)
