@@ -2,6 +2,7 @@
 import os
 
 import argparse
+import time
 
 import cv2
 
@@ -29,14 +30,6 @@ import caffe
 #remove the following two lines if testing with cpu
 caffe.set_mode_gpu()
 caffe.set_device(0)
-
-#im_lst = []
-#for i in range(0, 1):
-#    im = Image.open('000000.png')
-#    in_ = np.array(im, dtype=np.float32)
-#    in_ = in_[:,:,::-1]
-#    in_ -= np.array((104.00698793,116.66876762,122.67891434))
-#    im_lst.append(in_)
 
 #Visualization
 def plot_single_scale(scale_lst, size, out_fn):
@@ -74,13 +67,11 @@ def assemble_multiscale(img_fn_l):
     out[h:h+1,:] = 0
     return out
 
-#idx = 0
-#
-#in_ = im_lst[idx]
-#in_ = in_.transpose((2,0,1))
 # load net
 model_root = './'
 net = caffe.Net(model_root+'deploy.prototxt', model_root+'hed_pretrained_bsds.caffemodel', caffe.TEST)
+
+global_start_time = time.time()
 
 for seq in SEQ_L:
 
@@ -97,7 +88,14 @@ for seq in SEQ_L:
 
     # let's go
     img_dir = os.path.join(DATA_ROOT_DIR, seq, IMG_SUBDIR)
-    for img_root_fn in sorted(os.listdir(img_dir))[:10]:
+    for img_root_fn in sorted(os.listdir(img_dir)):
+        fuse_fn = os.path.join(fuse_dir, img_root_fn.split(".")[0] +'.txt')
+        if os.path.exists(fuse_fn):
+            continue
+        duration = time.time() - global_start_time
+        print('seq: %s - %s - %d:%02d'%(seq, img_root_fn, duration/60, duration%60))
+
+
         img_fn = os.path.join(img_dir, img_root_fn)
         im = Image.open(img_fn)
         in_ = np.array(im, dtype=np.float32)
@@ -119,8 +117,9 @@ for seq in SEQ_L:
         fuse = net.blobs['sigmoid-fuse'].data[0][0,:,:]
     
         # save edge prob
-        fuse_fn = os.path.join(fuse_dir, img_root_fn.split(".")[0] +'.txt')
-        np.savetxt(fuse_fn, fuse)
+        #print(fuse.shape)
+        #print(fuse.dtype)
+        #np.savetxt(fuse_fn, fuse)
 
         # save edge img
         fuse = (255*(fuse)).astype(np.uint8)
@@ -130,8 +129,10 @@ for seq in SEQ_L:
         # save multi scale edge prob
         scale_lst = [out1, out2, out3, out4, out5]
         for i, out in enumerate(scale_lst):
-            out_fn = os.path.join(scale_dir[i+1], img_root_fn.split(".")[0] +'.txt')
-            np.savetxt(out_fn, out)
+            #out_fn = os.path.join(scale_dir[i+1], img_root_fn.split(".")[0] +'.txt')
+            #np.savetxt(out_fn, (255*out).astype(np.uint8))
+            out_fn = os.path.join(scale_dir[i+1], img_root_fn)
+            cv2.imwrite(out_fn, (255*out).astype(np.uint8))
         
         #fuse = (1-fuse)
         #print(fuse)
