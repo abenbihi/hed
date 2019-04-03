@@ -16,9 +16,12 @@ import scipy.io
 
 
 DATA_ROOT_DIR = '/home/gpu_user/assia/ws/datasets/kitti'
-SEQ_L = ['%02d'%d for d in range(11)]
-IMG_SUBDIR = 'image_2'
 RES_DIR = './res'
+
+
+SEQ_L = ['%02d'%d for d in range(11)]
+# SEQ_L [ '04' ] # to just on run '04'
+IMG_SUBDIR = 'image_2'
 NEW_W, NEW_H = 1242,375
 
 # Make sure that caffe is on the python path:
@@ -130,12 +133,12 @@ for seq in SEQ_L:
         cv2.imwrite(fuse_fn, fuse)
 
         # save multi scale edge prob
-        #scale_lst = [out1, out2, out3, out4, out5]
-        #for i, out in enumerate(scale_lst):
-        #    #out_fn = os.path.join(scale_dir[i+1], img_root_fn.split(".")[0] +'.txt')
-        #    #np.savetxt(out_fn, (255*out).astype(np.uint8))
-        #    out_fn = os.path.join(scale_dir[i+1], img_root_fn)
-        #    cv2.imwrite(out_fn, (255*out).astype(np.uint8))
+        scale_lst = [out1, out2, out3, out4, out5]
+        for i, out in enumerate(scale_lst):
+            #out_fn = os.path.join(scale_dir[i+1], img_root_fn.split(".")[0] +'.txt')
+            #np.savetxt(out_fn, (255*out).astype(np.uint8))
+            out_fn = os.path.join(scale_dir[i+1], img_root_fn)
+            cv2.imwrite(out_fn, (255*out).astype(np.uint8))
         
         #fuse = (1-fuse)
         #print(fuse)

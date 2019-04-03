@@ -19,6 +19,7 @@ IMG_SUBDIR = 'image_2'
 RES_DIR = './res'
 NUM_CLASS = 19
 
+global_start_time = time.time()
 for seq in SEQ_L:
 
     # prepare output dir
@@ -29,14 +30,21 @@ for seq in SEQ_L:
             os.makedirs(class_dir)
 
     edge_dir = os.path.join(RES_DIR, seq, 'fuse')
+    if not os.path.exists(edge_dir):
+        print('Abort: You were too fast for hed. Seq %s was not processed yet'%seq)
+        exit(0)
     seg_dir = os.path.join(SEG_DIR, seq, 'prob')
 
     # let's go
     img_dir = os.path.join(DATA_ROOT_DIR, seq, IMG_SUBDIR)
-    for img_root_fn in sorted(os.listdir(img_dir))[:10]:
-        print(img_root_fn)
+    for img_root_fn in sorted(os.listdir(img_dir)):
+        seg_edge_fn = os.path.join(out_dir, 'class_%d'%i, img_root_fn)
+        if os.path.exists(seg_edge_fn):
+            continue
+        duration = time.time() - global_start_time
+        print('seq: %s - %s - %d:%02d'%(seq, img_root_fn, duration/60, duration%60))
 
-        img_fn  = os.path.join(img_dir, img_root_fn)
+        #img_fn  = os.path.join(img_dir, img_root_fn)
         edge_fn = os.path.join(edge_dir, img_root_fn)
 
         edge = cv2.imread(edge_fn)
@@ -52,11 +60,4 @@ for seq in SEQ_L:
             seg_edge_fn = os.path.join(out_dir, 'class_%d'%i, img_root_fn)
             cv2.imwrite(seg_edge_fn, seg_edge)
     
-    exit(0)
-
-
-
-
-
-
 
