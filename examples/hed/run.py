@@ -15,10 +15,11 @@ import Image
 import scipy.io
 
 
-DATA_ROOT_DIR = '/home/gpu_user/assia/ws/datasets/kitti'
-SEQ_L = ['%02d'%d for d in range(11)]
-IMG_SUBDIR = 'image_2'
-RES_DIR = './res'
+DATA_ROOT_DIR = '/home/gpu_user/xwu/edge_detector/dataset/rgb'
+RES_DIR = '/home/gpu_user/xwu/edge_detector/results/rgb/01'
+
+SEQ_L = ['01']
+IMG_SUBDIR = ''
 NEW_W, NEW_H = 1242,375
 
 # Make sure that caffe is on the python path:
@@ -80,14 +81,14 @@ for seq in SEQ_L:
     fuse_dir = os.path.join(out_dir, 'fuse')
     if not os.path.exists(fuse_dir):
         os.makedirs(fuse_dir)
-    #scale_dir = {}
-    #for i in range(1,6):
-    #    scale_dir[i] = os.path.join(out_dir, 'scale_%d'%i)
-    #    if not os.path.exists(scale_dir[i]):
-    #        os.makedirs(scale_dir[i])
+    scale_dir = {}
+    for i in range(1,6):
+        scale_dir[i] = os.path.join(out_dir, 'scale_%d'%i)
+        if not os.path.exists(scale_dir[i]):
+            os.makedirs(scale_dir[i])
 
     # let's go
-    img_dir = os.path.join(DATA_ROOT_DIR, seq, IMG_SUBDIR)
+    img_dir = os.path.join(DATA_ROOT_DIR, seq)
     for img_root_fn in sorted(os.listdir(img_dir)):
         fuse_fn = os.path.join(fuse_dir, img_root_fn)
         if os.path.exists(fuse_fn):
@@ -130,12 +131,12 @@ for seq in SEQ_L:
         cv2.imwrite(fuse_fn, fuse)
 
         # save multi scale edge prob
-        #scale_lst = [out1, out2, out3, out4, out5]
-        #for i, out in enumerate(scale_lst):
-        #    #out_fn = os.path.join(scale_dir[i+1], img_root_fn.split(".")[0] +'.txt')
-        #    #np.savetxt(out_fn, (255*out).astype(np.uint8))
-        #    out_fn = os.path.join(scale_dir[i+1], img_root_fn)
-        #    cv2.imwrite(out_fn, (255*out).astype(np.uint8))
+        scale_lst = [out1, out2, out3, out4, out5]
+        for i, out in enumerate(scale_lst):
+            #out_fn = os.path.join(scale_dir[i+1], img_root_fn.split(".")[0] +'.txt')
+            #np.savetxt(out_fn, (255*out).astype(np.uint8))
+            out_fn = os.path.join(scale_dir[i+1], img_root_fn)
+            cv2.imwrite(out_fn, (255*out).astype(np.uint8))
         
         #fuse = (1-fuse)
         #print(fuse)
