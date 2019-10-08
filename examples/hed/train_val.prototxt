@@ -171,11 +171,19 @@ layer { type: "Crop" name: 'crop' bottom: 'score-dsn2-up' bottom: 'data' top: 'u
 layer { type: "SigmoidCrossEntropyLoss" bottom: "upscore-dsn2" bottom: "label" top:"dsn2_loss"  loss_weight: 1}
 
 ### DSN conv 3 ###
-layer { name: 'score-dsn3' type: "Convolution" bottom: 'conv3_3' top: 'score-dsn3'
+layer { name: 'score-dsn3' 
+  type: "Convolution" 
+  bottom: 'conv3_3' 
+  top: 'score-dsn3'
   param { lr_mult: 0.01 decay_mult: 1 } param { lr_mult: 0.02 decay_mult: 0}
-  convolution_param { engine: CAFFE num_output: 1 kernel_size: 1 } }
-
-layer { type: "Deconvolution" name: 'upsample_4' bottom: 'score-dsn3' top: 'score-dsn3-up'
+  convolution_param { engine: CAFFE 
+    num_output: 1 
+    kernel_size: 1 
+  }
+}
+layer { type: "Deconvolution" 
+  name: 'upsample_4' 
+  bottom: 'score-dsn3' top: 'score-dsn3-up'
   param { lr_mult: 0 decay_mult: 1 } param { lr_mult: 0 decay_mult: 0}
   convolution_param { kernel_size: 8 stride: 4 num_output: 1 } }
 

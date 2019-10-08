@@ -18,7 +18,6 @@ import scipy.io
 DATA_ROOT_DIR = '/home/gpu_user/assia/ws/datasets/kitti'
 RES_DIR = './res'
 
-
 SEQ_L = ['%02d'%d for d in range(11)]
 # SEQ_L [ '04' ] # to just on run '04'
 IMG_SUBDIR = 'image_2'
@@ -83,14 +82,14 @@ for seq in SEQ_L:
     fuse_dir = os.path.join(out_dir, 'fuse')
     if not os.path.exists(fuse_dir):
         os.makedirs(fuse_dir)
-    #scale_dir = {}
-    #for i in range(1,6):
-    #    scale_dir[i] = os.path.join(out_dir, 'scale_%d'%i)
-    #    if not os.path.exists(scale_dir[i]):
-    #        os.makedirs(scale_dir[i])
+    scale_dir = {}
+    for i in range(1,6):
+        scale_dir[i] = os.path.join(out_dir, 'scale_%d'%i)
+        if not os.path.exists(scale_dir[i]):
+            os.makedirs(scale_dir[i])
 
     # let's go
-    img_dir = os.path.join(DATA_ROOT_DIR, seq, IMG_SUBDIR)
+    img_dir = os.path.join(DATA_ROOT_DIR, seq)
     for img_root_fn in sorted(os.listdir(img_dir)):
         fuse_fn = os.path.join(fuse_dir, img_root_fn)
         if os.path.exists(fuse_fn):
