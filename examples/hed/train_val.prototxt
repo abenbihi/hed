@@ -174,19 +174,55 @@ layer { type: "SigmoidCrossEntropyLoss" bottom: "upscore-dsn2" bottom: "label" t
 layer { name: 'score-dsn3' type: "Convolution" bottom: 'conv3_3' top: 'score-dsn3'
   param { lr_mult: 0.01 decay_mult: 1 } param { lr_mult: 0.02 decay_mult: 0}
   convolution_param { engine: CAFFE num_output: 1 kernel_size: 1 } }
+
 layer { type: "Deconvolution" name: 'upsample_4' bottom: 'score-dsn3' top: 'score-dsn3-up'
   param { lr_mult: 0 decay_mult: 1 } param { lr_mult: 0 decay_mult: 0}
   convolution_param { kernel_size: 8 stride: 4 num_output: 1 } }
+
 layer { type: "Crop" name: 'crop' bottom: 'score-dsn3-up' bottom: 'data' top: 'upscore-dsn3' }
 layer { type: "SigmoidCrossEntropyLoss" bottom: "upscore-dsn3" bottom: "label" top:"dsn3_loss"  loss_weight: 1}
 
 ###DSN conv 4###
-layer { name: 'score-dsn4' type: "Convolution" bottom: 'conv4_3' top: 'score-dsn4'
-  param { lr_mult: 0.01 decay_mult: 1 } param { lr_mult: 0.02 decay_mult: 0}
-  convolution_param { engine: CAFFE num_output: 1 kernel_size: 1 } }
-layer { type: "Deconvolution" name: 'upsample_8' bottom: 'score-dsn4' top: 'score-dsn4-up'
-  param { lr_mult: 0 decay_mult: 1 } param { lr_mult: 0 decay_mult: 0}
-  convolution_param { kernel_size: 16 stride: 8 num_output: 1 } }
+layer { 
+  name: 'score-dsn4' 
+  type: "Convolution" 
+  bottom: 'conv4_3' 
+  top: 'score-dsn4'
+  param { 
+    lr_mult: 0.01 
+    decay_mult: 1 
+  } 
+  param { 
+    lr_mult: 0.02 
+    decay_mult: 0
+    }
+  convolution_param { 
+    engine: CAFFE 
+    num_output: 1 
+    kernel_size: 1 
+    } 
+}
+
+
+layer {
+  type: "Deconvolution" 
+  name: 'upsample_8' 
+  bottom: 'score-dsn4' 
+  top: 'score-dsn4-up'
+  param { 
+    lr_mult: 0 
+    decay_mult: 1 
+  } 
+  param { 
+    lr_mult: 0 
+    decay_mult: 0
+  }
+  convolution_param { 
+    kernel_size: 16 
+    stride: 8 
+    num_output: 1 
+  } 
+}
 layer { type: "Crop" name: 'crop' bottom: 'score-dsn4-up' bottom: 'data' top: 'upscore-dsn4' }
 layer { type: "SigmoidCrossEntropyLoss" bottom: "upscore-dsn4" bottom: "label" top:"dsn4_loss"  loss_weight: 1}
 
