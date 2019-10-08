@@ -15,11 +15,12 @@ import Image
 import scipy.io
 
 
-DATA_ROOT_DIR = '/home/gpu_user/xwu/edge_detector/dataset/rgb'
-RES_DIR = '/home/gpu_user/xwu/edge_detector/results/rgb/01'
+DATA_ROOT_DIR = '/home/gpu_user/assia/ws/datasets/kitti'
+RES_DIR = './res'
 
-SEQ_L = ['01']
-IMG_SUBDIR = ''
+SEQ_L = ['%02d'%d for d in range(11)]
+# SEQ_L [ '04' ] # to just on run '04'
+IMG_SUBDIR = 'image_2'
 NEW_W, NEW_H = 1242,375
 
 # Make sure that caffe is on the python path:

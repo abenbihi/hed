@@ -1,3 +1,22 @@
+## Added by Assia
+
+### Install
+    git clone https://github.com/assiaben/hed.git
+    cd hed
+    make -j12 all tools pycaffe
+
+### Run
+
+Change data path in `run.py`
+
+    DATA_ROOT_DIR = '/home/gpu_user/assia/ws/datasets/kitti'
+
+Run it
+
+    python run.py
+
+The results are output in `RES_DIR`. 
+
 ## Holistically-Nested Edge Detection
 
 Created by Saining Xie at UC San Diego
