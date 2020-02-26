@@ -18,7 +18,8 @@ import scipy.io
 DATA_ROOT_DIR = '/home/gpu_user/assia/ws/datasets/kitti'
 RES_DIR = './res'
 
-SEQ_L = ['%02d'%d for d in range(11)]
+SEQ_L = ['%02d'%d for d in range(2,3)]
+#SEQ_L = ['%02d'%d for d in range(11)]
 # SEQ_L [ '04' ] # to just on run '04'
 IMG_SUBDIR = 'image_2'
 NEW_W, NEW_H = 1242,375
@@ -82,23 +83,25 @@ for seq in SEQ_L:
     fuse_dir = os.path.join(out_dir, 'fuse')
     if not os.path.exists(fuse_dir):
         os.makedirs(fuse_dir)
-    scale_dir = {}
-    for i in range(1,6):
-        scale_dir[i] = os.path.join(out_dir, 'scale_%d'%i)
-        if not os.path.exists(scale_dir[i]):
-            os.makedirs(scale_dir[i])
+    #scale_dir = {}
+    #for i in range(1,6):
+    #    scale_dir[i] = os.path.join(out_dir, 'scale_%d'%i)
+    #    if not os.path.exists(scale_dir[i]):
+    #        os.makedirs(scale_dir[i])
 
     # let's go
-    img_dir = os.path.join(DATA_ROOT_DIR, seq)
+    #img_dir = os.path.join(DATA_ROOT_DIR, seq)
+    img_dir = "%s/%s/image_2"%(DATA_ROOT_DIR, seq)
     for img_root_fn in sorted(os.listdir(img_dir)):
         fuse_fn = os.path.join(fuse_dir, img_root_fn)
-        if os.path.exists(fuse_fn):
-            continue
+        #if os.path.exists(fuse_fn):
+        #    continue
         duration = time.time() - global_start_time
-        print('seq: %s - %s - %d:%02d'%(seq, img_root_fn, duration/60, duration%60))
+        #print('seq: %s - %s - %d:%02d'%(seq, img_root_fn, duration/60, duration%60))
 
 
         img_fn = os.path.join(img_dir, img_root_fn)
+        #print(img_fn)
         #im = Image.open(img_fn)
         #in_ = np.array(im, dtype=np.float32)
         #in_ = in_[:,:,::-1]
@@ -114,11 +117,11 @@ for seq in SEQ_L:
         net.blobs['data'].data[...] = in_
         # run net and take argmax for prediction
         net.forward()
-        out1 = net.blobs['sigmoid-dsn1'].data[0][0,:,:]
-        out2 = net.blobs['sigmoid-dsn2'].data[0][0,:,:]
-        out3 = net.blobs['sigmoid-dsn3'].data[0][0,:,:]
-        out4 = net.blobs['sigmoid-dsn4'].data[0][0,:,:]
-        out5 = net.blobs['sigmoid-dsn5'].data[0][0,:,:]
+        #out1 = net.blobs['sigmoid-dsn1'].data[0][0,:,:]
+        #out2 = net.blobs['sigmoid-dsn2'].data[0][0,:,:]
+        #out3 = net.blobs['sigmoid-dsn3'].data[0][0,:,:]
+        #out4 = net.blobs['sigmoid-dsn4'].data[0][0,:,:]
+        #out5 = net.blobs['sigmoid-dsn5'].data[0][0,:,:]
         fuse = net.blobs['sigmoid-fuse'].data[0][0,:,:]
     
         # save edge prob
@@ -126,18 +129,20 @@ for seq in SEQ_L:
         #print(fuse.dtype)
         #np.savetxt(fuse_fn, fuse)
 
-        # save edge img
-        fuse = (255*(fuse)).astype(np.uint8)
-        fuse_fn = os.path.join(fuse_dir, img_root_fn)
-        cv2.imwrite(fuse_fn, fuse)
+        ## save edge img
+        #fuse = (255*(fuse)).astype(np.uint8)
+        #fuse_fn = os.path.join(fuse_dir, img_root_fn)
+        #cv2.imwrite(fuse_fn, fuse)
 
-        # save multi scale edge prob
-        scale_lst = [out1, out2, out3, out4, out5]
-        for i, out in enumerate(scale_lst):
-            #out_fn = os.path.join(scale_dir[i+1], img_root_fn.split(".")[0] +'.txt')
-            #np.savetxt(out_fn, (255*out).astype(np.uint8))
-            out_fn = os.path.join(scale_dir[i+1], img_root_fn)
-            cv2.imwrite(out_fn, (255*out).astype(np.uint8))
+        ## save multi scale edge prob
+        #scale_lst = [out1, out2, out3, out4, out5]
+        #for i, out in enumerate(scale_lst):
+        #    #out_fn = os.path.join(scale_dir[i+1], img_root_fn.split(".")[0] +'.txt')
+        #    #np.savetxt(out_fn, (255*out).astype(np.uint8))
+        #    out_fn = os.path.join(scale_dir[i+1], img_root_fn)
+        #    cv2.imwrite(out_fn, (255*out).astype(np.uint8))
+        
+        
         
         #fuse = (1-fuse)
         #print(fuse)
@@ -151,3 +156,5 @@ for seq in SEQ_L:
         #cv2.imwrite('multi_scale.png', (255*multi_scale).astype(np.uint8))
         #cv2.waitKey(0)
 
+    duration = time.time() - global_start_time
+    print('seq: %s - %d:%02d'%(seq, duration/60, duration%60))

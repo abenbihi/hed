@@ -52,17 +52,17 @@ def assemble_multiscale(img_fn_l):
 
 def main(args):
     global_start_time = time.time()
-    assert(os.path.exists(args.deploy_prototxt_file))
+    assert(os.path.exists(args.prototxt))
     assert(os.path.exists(args.model))
     
     # caffe setup
-    if os.path.exists(args.pycaffe_folder)): # ../../python/
+    if os.path.exists(args.pycaffe_folder): # ../../python/
         sys.path.insert(0, args.pycaffe_folder)
     import caffe
     caffe.set_mode_gpu()
     caffe.set_device(args.gpu)
 
-    net = caffe.Net(args.protoxt, args.model, caffe.TEST)
+    net = caffe.Net(args.prototxt, args.model, caffe.TEST)
     
     # prepare output dir
     fuse_dir = "%s/fuse/"%args.res_dir
@@ -81,13 +81,13 @@ def main(args):
 
 
     for idx, img_fn in enumerate(img_fn_l):
-        out_fn = "%s/%s.png"%(fuse_dir, root_fn_l[idx])
+        out_fn = "%s/%s"%(fuse_dir, root_fn_l[idx])
         if os.path.exists(out_fn): # this img is already done
             continue
         duration = time.time() - global_start_time
         if idx%20 == 0:
             print('%d/%d\t%d:%02d'%(idx, len(root_fn_l), duration/60, duration%60))
-    
+        
         in_ = cv2.imread(img_fn)
         in_ = in_.astype(np.float32)
         in_ -= np.array((104.00698793,116.66876762,122.67891434))
@@ -102,13 +102,12 @@ def main(args):
     
         # save edge img
         fuse = (255*(fuse)).astype(np.uint8)
-        fuse_fn = os.path.join(fuse_dir, img_root_fn)
-        cv2.imwrite("%s/%s.png"%(fuse_dir, root_fn_l[idx]), fuse)
+        cv2.imwrite(out_fn, fuse)
     
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--prototxt" type=str,required=True)
+    parser.add_argument("--prototxt", type=str,required=True)
     parser.add_argument('--model', type=str, help="path to the caffemodel")
     parser.add_argument('--pycaffe_folder', type=str, default='../../code/python',
                         help="pycaffe folder that contains the caffe/_caffe.so file")
@@ -121,3 +120,6 @@ if __name__=="__main__":
     
     parser.add_argument('--img_dir', type=str, default='', help="image dir")
     parser.add_argument('--res_dir', type=str, default='.', help="folder to store the test results")
+    args = parser.parse_args() 
+
+    main(args)
